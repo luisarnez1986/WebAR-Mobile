@@ -109,49 +109,15 @@ Crear Proyecto
 
 <script>
 
+alert("JavaScript cargado");
+
 const boton = document.getElementById("crearProyecto");
 
-boton.addEventListener("click", async () => {
+boton.onclick = function () {
 
-const cliente = document.getElementById("cliente").value;
-const evento = document.getElementById("evento").value;
-const imagen = document.getElementById("imagen").files[0];
-const video = document.getElementById("video").files[0];
+    alert("Botón funcionando");
 
-if(!cliente || !evento || !imagen || !video){
-alert("Debe completar todos los campos.");
-return;
-}
-
-const datos = new FormData();
-
-datos.append("cliente",cliente);
-datos.append("evento",evento);
-datos.append("imagen",imagen);
-datos.append("video",video);
-
-try{
-
-const respuesta = await fetch("/api/upload",{
-method:"POST",
-body:datos
-});
-
-const resultado = await respuesta.json();
-
-alert(resultado.mensaje);
-
-console.log(resultado);
-
-}catch(error){
-
-console.error(error);
-
-alert("Error al enviar los datos.");
-
-}
-
-});
+};
 
 </script>
 
