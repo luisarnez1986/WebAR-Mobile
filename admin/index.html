@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Creación WebAR - Panel de Administración</title>
 
@@ -20,68 +16,105 @@
 
     body {
       background: #f4f6f9;
+      color: #111827;
     }
 
     header {
-      background: #111827;
+      background: #0f172a;
       color: white;
-      padding: 20px 30px;
-      font-size: 24px;
-      font-weight: bold;
+      padding: 25px;
     }
 
-    .container {
-      padding: 30px;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 850px;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      margin-bottom: 25px;
+    header h1 {
       font-size: 30px;
     }
 
-    .campo {
-      margin-bottom: 18px;
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
 
-    input {
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10);
+    }
+
+    h2 {
+      font-size: 30px;
+      margin-bottom: 28px;
+    }
+
+    .campo {
+      margin-bottom: 20px;
+    }
+
+    input,
+    textarea {
       width: 100%;
-      padding: 15px;
-      border: 1px solid #ccc;
+      padding: 18px;
+      border: 1px solid #d1d5db;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 17px;
+      background: white;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
     }
 
     input[type="file"] {
-      background: white;
+      padding: 16px;
     }
 
     button {
       width: 100%;
-      padding: 16px;
-      background: #2563eb;
-      color: white;
+      padding: 18px;
       border: none;
-      border-radius: 8px;
-      font-size: 18px;
+      border-radius: 10px;
+      background: #173477;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
       cursor: pointer;
     }
 
     button:hover {
-      background: #1d4ed8;
+      background: #10275c;
     }
 
     button:disabled {
-      background: #94a3b8;
+      background: #64748b;
       cursor: not-allowed;
+    }
+
+    #estado {
+      margin-top: 22px;
+      padding: 15px;
+      border-radius: 8px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .exito {
+      display: block !important;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      display: block !important;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .procesando {
+      display: block !important;
+      background: #e0f2fe;
+      color: #075985;
     }
   </style>
 </head>
@@ -89,158 +122,183 @@
 <body>
 
   <header>
-    Creación WebAR - Panel de Administración
+    <h1>Creación WebAR - Panel de Administración</h1>
   </header>
 
-  <div class="container">
+  <main>
 
     <div class="card">
 
-      <h1>Nuevo Proyecto</h1>
+      <h2>Nuevo Proyecto</h2>
 
-      <div class="campo">
-        <input
-          type="text"
-          id="cliente"
-          placeholder="Nombre del cliente"
+      <form id="formProyecto">
+
+        <div class="campo">
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Nombre del proyecto"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            placeholder="Descripción del proyecto"
+          ></textarea>
+        </div>
+
+        <div class="campo">
+          <input
+            type="file"
+            id="imagen"
+            name="imagen"
+            accept="image/*"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <input
+            type="file"
+            id="video"
+            name="video"
+            accept="video/*"
+            required
+          >
+        </div>
+
+        <button
+          type="submit"
+          id="botonCrear"
         >
-      </div>
+          Crear Proyecto
+        </button>
 
-      <div class="campo">
-        <input
-          type="text"
-          id="evento"
-          placeholder="Tipo de evento"
-        >
-      </div>
+      </form>
 
-      <div class="campo">
-        <input
-          type="file"
-          id="imagen"
-          accept="image/*"
-        >
-      </div>
-
-      <div class="campo">
-        <input
-          type="file"
-          id="video"
-          accept="video/*"
-        >
-      </div>
-
-      <button
-        type="button"
-        id="crearProyecto"
-      >
-        Crear Proyecto
-      </button>
+      <div id="estado"></div>
 
     </div>
 
-  </div>
+  </main>
 
   <script>
-    const boton = document.getElementById("crearProyecto");
 
-    boton.addEventListener("click", async function () {
+    const formulario = document.getElementById("formProyecto");
+    const botonCrear = document.getElementById("botonCrear");
+    const estado = document.getElementById("estado");
 
-      const cliente = document.getElementById("cliente");
-      const evento = document.getElementById("evento");
-      const imagen = document.getElementById("imagen");
-      const video = document.getElementById("video");
+    formulario.addEventListener("submit", async function(event) {
 
-      if (
-        !cliente.value.trim() ||
-        !evento.value.trim() ||
-        imagen.files.length === 0 ||
-        video.files.length === 0
-      ) {
-        alert(
-          "Completa todos los campos y selecciona una imagen y un video."
-        );
+      event.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const descripcion = document.getElementById("descripcion").value.trim();
+      const imagen = document.getElementById("imagen").files[0];
+      const video = document.getElementById("video").files[0];
+
+      if (!nombre) {
+        alert("Escribe el nombre del proyecto.");
         return;
       }
 
-      const datos = new FormData();
+      if (!imagen) {
+        alert("Selecciona una imagen.");
+        return;
+      }
 
-      datos.append(
-        "cliente",
-        cliente.value.trim()
-      );
+      if (!video) {
+        alert("Selecciona un video.");
+        return;
+      }
 
-      datos.append(
-        "evento",
-        evento.value.trim()
-      );
+      const formData = new FormData();
 
-      datos.append(
-        "imagen",
-        imagen.files[0]
-      );
+      formData.append("nombre", nombre);
+      formData.append("descripcion", descripcion);
+      formData.append("imagen", imagen);
+      formData.append("video", video);
 
-      datos.append(
-        "video",
-        video.files[0]
-      );
+      botonCrear.disabled = true;
+      botonCrear.textContent = "Procesando proyecto...";
 
-      boton.disabled = true;
-      boton.textContent = "Procesando proyecto...";
+      estado.className = "procesando";
+      estado.textContent = "Subiendo imagen y video...";
 
       try {
 
-        const respuesta = await fetch(
-          "/api/upload",
-          {
-            method: "POST",
-            body: datos
-          }
-        );
+        const respuesta = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
+        });
 
-        const resultado = await respuesta.json();
+        let datos;
 
-        console.log(resultado);
-
-        if (
-          !respuesta.ok ||
-          !resultado.ok
-        ) {
-          alert(
-            resultado.mensaje +
-            (
-              resultado.error
-                ? "\n\nDetalle: " + resultado.error
-                : ""
-            )
+        try {
+          datos = await respuesta.json();
+        } catch (errorJSON) {
+          throw new Error(
+            "El servidor respondió con un formato no válido. Código HTTP: " +
+            respuesta.status
           );
-
-          return;
         }
 
+        console.log("Respuesta API:", datos);
+
+        if (!respuesta.ok || !datos.ok) {
+
+          throw new Error(
+            datos.error ||
+            datos.mensaje ||
+            "Error desconocido al crear el proyecto"
+          );
+
+        }
+
+        estado.className = "exito";
+
+        estado.innerHTML =
+          "<strong>Proyecto creado correctamente.</strong><br><br>" +
+          "Nombre: " + datos.proyecto.nombre + "<br>" +
+          "ID: " + datos.proyecto.id + "<br>" +
+          "Imagen: " + datos.proyecto.imagen + "<br>" +
+          "Video: " + datos.proyecto.video;
+
         alert(
-          resultado.mensaje
+          "Proyecto creado correctamente y guardado en R2"
         );
+
+        formulario.reset();
 
       } catch (error) {
 
-        console.error(error);
+        console.error("Error:", error);
+
+        estado.className = "error";
+
+        estado.textContent =
+          "Error: " + error.message;
 
         alert(
-          "Error al conectar con la API.\n\nDetalle: " +
+          "Error al procesar el proyecto\n\n" +
+          "Detalle: " +
           error.message
         );
 
       } finally {
 
-        boton.disabled = false;
-        boton.textContent = "Crear Proyecto";
+        botonCrear.disabled = false;
+        botonCrear.textContent = "Crear Proyecto";
 
       }
 
     });
+
   </script>
 
 </body>
-
 </html>
