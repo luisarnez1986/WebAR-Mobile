@@ -108,18 +108,24 @@ Crear Proyecto
 </div>
 
 <script>
-
-alert("JavaScript cargado");
-
 const boton = document.getElementById("crearProyecto");
 
-boton.onclick = function () {
+boton.addEventListener("click", async () => {
+    alert("Conexión con API iniciada");
 
-    alert("Botón funcionando");
+    try {
+        const respuesta = await fetch("/api/upload", {
+            method: "POST"
+        });
 
-};
+        const resultado = await respuesta.json();
 
+        alert(resultado.mensaje);
+        console.log(resultado);
+
+    } catch (error) {
+        console.error(error);
+        alert("Error al conectar con la API");
+    }
+});
 </script>
-
-</body>
-</html>
